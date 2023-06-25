@@ -319,6 +319,16 @@ module.exports = function (webpackEnv) {
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
         ...(modules.webpackAliases || {}),
+        '@': path.resolve(__dirname, '../src'),
+      },
+      fallback: {
+        'fs': false,
+        'stream': require.resolve('stream-browserify'),
+        'assert': require.resolve('assert'),
+        'crypto': require.resolve('crypto-browserify'),
+        'querystring': require.resolve('querystring'),
+        'constants': require.resolve('constants-browserify'),
+        'buffer': require.resolve('buffer')
       },
       plugins: [
         // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -589,6 +599,13 @@ module.exports = function (webpackEnv) {
             : undefined
         )
       ),
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+      }),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+      }),
+      new webpack.ProgressPlugin(),
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
       // https://github.com/facebook/create-react-app/issues/5358
@@ -751,5 +768,6 @@ module.exports = function (webpackEnv) {
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter
     performance: false,
+    ignoreWarnings: [/Failed to parse source map/],
   };
 };
