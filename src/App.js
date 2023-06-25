@@ -10,6 +10,7 @@ import Layout from './components/Layout/index.jsx';
 import Wallet, { WalletContext } from './utils/wallet.js';
 // page
 import GroupNFTHolderUpdate from '@/pages/GroupNFTHolder/Update.jsx';
+import GroupNFTHolderUpgrade from '@/pages/GroupNFTHolder/Upgrade.jsx';
 
 const Body = styled.div`
   width: 100%;
@@ -35,7 +36,7 @@ function App() {
               </Route>
               <Route element={<DefaultComponent />} path="/GroupNFTHolder">
                 <Route element={<GroupNFTHolderUpdate />} path="Update" />
-                <Route element={<DefaultComponentChild />} path="Upgrade" />
+                <Route element={<GroupNFTHolderUpgrade />} path="Upgrade" />
               </Route>
               <Route element={<DefaultComponent />} path="/AdminNFTHolder">
                 <Route element={<DefaultComponentChild />} path="Update" />
