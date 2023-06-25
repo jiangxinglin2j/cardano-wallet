@@ -228,6 +228,7 @@ module.exports = function (webpackEnv) {
               .replace(/\\/g, '/')
         : isEnvDevelopment &&
           (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
+      wasmLoading: 'fetch',
     },
     cache: {
       type: 'filesystem',
@@ -349,6 +350,10 @@ module.exports = function (webpackEnv) {
     module: {
       strictExportPresence: true,
       rules: [
+        {
+          test: /\.wasm$/,
+          type: 'webassembly/async',
+        },
         // Handle node_modules packages that contain sourcemaps
         shouldUseSourceMap && {
           enforce: 'pre',
@@ -571,6 +576,9 @@ module.exports = function (webpackEnv) {
           ],
         },
       ].filter(Boolean),
+    },
+    experiments: {
+      asyncWebAssembly: true,
     },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
