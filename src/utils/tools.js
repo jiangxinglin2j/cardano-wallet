@@ -17,9 +17,35 @@ export const formatStrFn = (num) => {
   return num;
 }
 
+export const downLoadJsonDataFn = (json, fileName) => {
+  // plan a
+  // const href = `data:text/json;charset=utf-8,${encodeURIComponent(
+  //   JSON.stringify(json)
+  // )}`;
+  // const link = document.createElement('a');
+  // link.href = href;
+  // link.download = `${fileName}.json`;
+  // document.body.appendChild(link);
+  // link.click();
+  // document.body.removeChild(link);
+
+  // plan b
+  const jsonData = JSON.stringify(json, null, 2);
+  const blob = new Blob([jsonData], { type: "application/json" });
+  const href = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = href;
+  link.download = `${fileName}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(href);
+}
+
 const tools = {
   subStrFn,
-  formatStrFn
+  formatStrFn,
+  downLoadJsonDataFn
 }
 
 export default tools;
