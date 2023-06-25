@@ -13,19 +13,18 @@ function Wallet() {
   const {
     connected,
     address,
-    account,
     connect
   } = wallet;
 
   const connectWallet = async () => {
-    if (!connected) {
-      console.log('onConnect', connect)
-      connect();
-    }
+    connect();
+    console.log('address', address);
   }
 
   return (
-    <WalletBtn type="primary" onClick={connectWallet}>{ connected ? subStrFn(address, 7, 8) : 'connect wallet' }</WalletBtn>
+    <>
+      <WalletBtn type="primary" onClick={connectWallet}>{ connected ? subStrFn(address, 7, 8) : 'connect wallet' }</WalletBtn>
+    </>
   )
 };
 

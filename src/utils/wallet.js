@@ -36,24 +36,27 @@ class Wallet extends React.Component {
       resetApp: this.resetApp,
       connect: this.onConnect,
       initSigner: this.initSigner,
-      signedTx: this.signedTx
+      signedTx: this.signedTx,
+      chooseAddress: this.chooseAddress
     };
 
     this.setWallet = props.setWallet;
     this.setWallet(intiState);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // has cache
     if (true) {
       // lear cache & return
       
     }
+    await CardanoExtension.init();
+    this.sdkWallet = this.getCardanoWallet();
     this.onConnect();
   }
 
-  getCardanoWallet = async () => {
-    await CardanoExtension.init();
+  getCardanoWallet = () => {
+    // await CardanoExtension.init();
     // await Signer.init("ogmios.wanchain.org", 1337);
     if (window.cardano.nami) {
       return new CardanoExtension.NamiWallet(network);
@@ -64,23 +67,33 @@ class Wallet extends React.Component {
 
   initSigner = async () => {
     // await Signer.init("ogmios.wanchain.org", 1337);
-    const sdkWallet = await this.getCardanoWallet();
-    let cardanoSigner = new CardanoExtension.Signer("testnet", sdkWallet); 
+    let cardanoSigner = new CardanoExtension.Signer("testnet", this.sdkWallet); 
     await cardanoSigner.init("ogmios.wanchain.org", 1337); 
     return cardanoSigner;
   }
 
   signedTx = async (update, signData) => {
-    const signer = await this.initSigner();
-    const signedTxData = await signer.updateGroupNFT( update, signData ); 
-    console.log({signedTxData}); 
+    try {
+      const signer = await this.initSigner();
+      await signer.updateGroupNFT( update, signData ); 
+    } catch (e) {
+      console.error('signedTx', e)
+      throw new Error(e.info)
+    }
+  }
+
+  chooseAddress = (i) => {
+    this.setWallet({
+      address: this.accounts[i]
+    })
   }
 
   onConnect = async () => {
     try {
-      let provider = await this.getCardanoWallet();
+      let provider = this.sdkWallet;
 
       const accounts = await provider.getAccounts(network);
+      this.accounts = accounts;
 
       const address = accounts[0];
 
@@ -94,7 +107,8 @@ class Wallet extends React.Component {
         // networkId,
         connect: this.onConnect,
         initSigner: this.initSigner,
-        signedTx: this.signedTx
+        signedTx: this.signedTx,
+        chooseAddress: this.chooseAddress
       });
     } catch (error) {
       console.error('err', error);

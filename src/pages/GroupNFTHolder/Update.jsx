@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Button, Radio, Space, Input } from 'antd';
+import { Button, Radio, Space, Input, message } from 'antd';
 import styled from 'styled-components';
 import { WalletContext } from '../../utils/wallet';
 import { getLocalData } from '../../utils/local';
@@ -25,9 +25,10 @@ const TextAreaCon = styled(TextArea)`
 `;
 
 function Update() {
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState('newOracleWorker');
   const [textValue, setTextValue] = useState('addr_test1qz6twkzgss75sk379u0e27phvwhmtqqfuhl5gnx7rh7nux2xg4uwrhx9t58far8hp3a06hfdfzlsxgfrzqv5ryc78e4s4dwh26');
   const wallet = useContext(WalletContext);
+  const [messageApi, contextHolder] = message.useMessage();
 
 
   const onChange = (e) => {
@@ -36,38 +37,22 @@ function Update() {
     setTextValue('');
   };
 
-  const handleUpdate = () => {
-    switch (value) {
-      case 1:
-        if (!textValue) throw new Error('inp text');
-        // const newOracleWorker = { 
-        //   newOracleWorker: "addr_test1qz6twkzgss75sk379u0e27phvwhmtqqfuhl5gnx7rh7nux2xg4uwrhx9t58far8hp3a06hfdfzlsxgfrzqv5ryc78e4s4dwh26" 
-        // }
-        // const signArr = [ 
-        //   "addr_test1qzqchffrha5hjcztwx0p48wtv0y36hw098rdw366fqlzuymun97wgelqtwe9aladfx2pukf4jdfqtjh7cnja50y247dsnalv6f" 
-        // ]
-        const newOracleWorker = { 
-          newOracleWorker: textValue
-        }
-        let signArr = getLocalData('sign');
-        if (!signArr) throw new Error('inp sign array');
-        signArr = Object.values(signArr).map(v => v.value);
-        console.log('signedTx option:', newOracleWorker, signArr)
-        wallet.signedTx(newOracleWorker, signArr);
-      break;
-      case 2:
-        console.log('cur radio checked', value, textValue);
-      break;
-      case 3:
-        console.log('cur radio checked', value, textValue);
-      break;
-      case 4:
-        console.log('cur radio checked', value, textValue);
-      break;
-      case 5:
-        console.log('cur radio checked', value, textValue);
-      break;
-      default: console.log('df');
+  const handleUpdate = async () => {
+    if (!textValue) throw new Error('inp text');
+    let signArr = getLocalData('sign');
+    if (!signArr) throw new Error('inp sign array');
+    signArr = Object.values(signArr).map(v => v.value);
+    const update = {
+      [value]: textValue
+    };
+    console.log('signedTx option:', update, signArr);
+    try {
+      await wallet.signedTx(update, signArr);
+    } catch (e) {
+      messageApi.open({
+        type: 'error',
+        content: String(e)
+      });
     }
   }
 
@@ -77,13 +62,13 @@ function Update() {
 
   return (
     <Body>
+      {contextHolder}
       <Radio.Group onChange={onChange} value={value}>
         <Space direction="vertical">
-          <Radio value={1}>newOracleWorker</Radio>
-          <Radio value={2}>mustSignBy</Radio>
-          <Radio value={3}>utxoForFee</Radio>
-          <Radio value={4}>utxoForCollaterals</Radio>
-          <Radio value={5}>changeAddr</Radio>
+          <Radio value={'newOracleWorker'}>newOracleWorker</Radio>
+          <Radio value={'newTreasuryCheckVH'}>newTreasuryCheckVH</Radio>
+          <Radio value={'newMintCheckVH'}>newMintCheckVH</Radio>
+          <Radio value={'newStackCheckVH'}>newStackCheckVH</Radio>
         </Space>
       </Radio.Group>
       <TextAreaCon placeholder='inp content' allowClear onChange={onTextAreaChange} value={textValue}></TextAreaCon>
