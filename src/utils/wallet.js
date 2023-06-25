@@ -36,12 +36,14 @@ class Wallet extends React.Component {
       resetApp: this.resetApp,
       connect: this.onConnect,
       initSigner: this.initSigner,
-      signedTx: this.signedTx,
-      chooseAddress: this.chooseAddress
+      updateGroupNFT: this.updateGroupNFT,
+      upgradeGroupNFT: this.upgradeGroupNFT,
     };
 
     this.setWallet = props.setWallet;
     this.setWallet(intiState);
+    this.sdkWallet = null;
+    this.cardanoSigner = null;
   }
 
   async componentDidMount() {
@@ -52,12 +54,10 @@ class Wallet extends React.Component {
     }
     await CardanoExtension.init();
     this.sdkWallet = this.getCardanoWallet();
-    this.onConnect();
+    await this.onConnect();
   }
 
   getCardanoWallet = () => {
-    // await CardanoExtension.init();
-    // await Signer.init("ogmios.wanchain.org", 1337);
     if (window.cardano.nami) {
       return new CardanoExtension.NamiWallet(network);
     } else {
@@ -66,26 +66,31 @@ class Wallet extends React.Component {
   }
 
   initSigner = async () => {
-    // await Signer.init("ogmios.wanchain.org", 1337);
     let cardanoSigner = new CardanoExtension.Signer("testnet", this.sdkWallet); 
     await cardanoSigner.init("ogmios.wanchain.org", 1337); 
-    return cardanoSigner;
+    this.cardanoSigner = cardanoSigner;
   }
 
-  signedTx = async (update, signData) => {
+  updateGroupNFT = async (update, signData) => {
     try {
-      const signer = await this.initSigner();
-      await signer.updateGroupNFT( update, signData ); 
+      if (!this.cardanoSigner) await this.initSigner();
+      const bob = await this.cardanoSigner.updateGroupNFT( update, signData ); 
+      console.log('bob', bob)
+      return bob;
     } catch (e) {
-      console.error('signedTx', e)
+      console.error('updateGroupNFT', e)
       throw new Error(e.info)
     }
   }
 
-  chooseAddress = (i) => {
-    this.setWallet({
-      address: this.accounts[i]
-    })
+  upgradeGroupNFT = async (update, signData) => {
+    try {
+      if (!this.cardanoSigner) await this.initSigner();
+      await this.cardanoSigner.upgradeGroupNFT( update, signData ); 
+    } catch (e) {
+      console.error('upgradeGroupNFT', e)
+      throw new Error(e)
+    }
   }
 
   onConnect = async () => {
@@ -107,8 +112,8 @@ class Wallet extends React.Component {
         // networkId,
         connect: this.onConnect,
         initSigner: this.initSigner,
-        signedTx: this.signedTx,
-        chooseAddress: this.chooseAddress
+        updateGroupNFT: this.updateGroupNFT,
+        upgradeGroupNFT: this.upgradeGroupNFT,
       });
     } catch (error) {
       console.error('err', error);
