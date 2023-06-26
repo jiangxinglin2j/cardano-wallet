@@ -11,6 +11,7 @@ import Wallet, { WalletContext } from './utils/wallet.js';
 // page
 import GroupNFTHolderUpdate from '@/pages/GroupNFTHolder/Update.jsx';
 import GroupNFTHolderUpgrade from '@/pages/GroupNFTHolder/Upgrade.jsx';
+import AddSignature4TXSerializedData from './pages/TXSignatures/AddSignature4TXSerializedData.jsx';
 
 const Body = styled.div`
   width: 100%;
@@ -31,7 +32,7 @@ function App() {
             <Routes>
               <Route element={<DefaultComponent />} path="/TXSignatures">
                 <Route element={<DefaultComponentChild />} path="TXSerialize&un-serialize" />
-                <Route element={<DefaultComponentChild />} path="AddSignature4TXSerializedData" />
+                <Route element={<AddSignature4TXSerializedData />} path="AddSignature4TXSerializedData" />
                 <Route element={<DefaultComponentChild />} path="SubmitTXWithSignedTXSerializedData" />
               </Route>
               <Route element={<DefaultComponent />} path="/GroupNFTHolder">
